@@ -10,6 +10,7 @@ class MainWindow;
 QT_END_NAMESPACE
 
 class QPushButton;
+class QDir;
 
 class MainWindow : public QMainWindow
 {
@@ -20,10 +21,12 @@ class MainWindow : public QMainWindow
     ~MainWindow() override;
 
   private slots:
-    void scanFolder();
+    void selectDir();
 
   private:
     Ui::MainWindow *ui;
 
     QPushButton *m_button;
+
+    void scan(QDir &&dir);
 };
