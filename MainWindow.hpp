@@ -28,5 +28,7 @@ class MainWindow : public QMainWindow
 
     QPushButton *m_button;
 
+    QPushButton *recup_dir_button;
+
     void scan(QDir &&dir);
 };

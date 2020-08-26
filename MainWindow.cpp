@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QTextLayout>
 #include <QtDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -17,8 +18,9 @@ MainWindow::MainWindow(QWidget *parent) :
                          QApplication::applicationVersion());
 
     centralWidget()->setLayout(new QGridLayout);
+
     const auto l = qobject_cast<QGridLayout *>(centralWidget()->layout());
-    m_button     = new QPushButton("&Select Directory");
+    m_button     = new QPushButton("Reorder Directory");
     connect(m_button, &QPushButton::clicked, this, &MainWindow::selectDir);
     l->addWidget(m_button);
 }
@@ -45,8 +47,26 @@ void MainWindow::selectDir()
 
 void MainWindow::scan(QDir &&dir)
 {
-    auto files = dir.entryList();
+    auto files =
+        dir.entryList(QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
+    QVector<QString> vect;
+
     for (auto f : files) {
-        qDebug() << f;
+        const auto extension = f.right(3);
+        if (!vect.contains(extension)) {
+            vect.append(extension);
+            if (!dir.mkdir(extension)) {
+                qWarning() << "error creating directory";
+                return;
+            }
+        }
+
+        QFile file(dir.absolutePath() + "/" + f);
+        if (!file.copy(dir.absolutePath() + "/" + extension + "/" + f)) {
+            qWarning() << "error when copy";
+            return;
+        }
+
+        file.remove();
     }
 }
